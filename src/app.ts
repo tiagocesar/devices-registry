@@ -47,6 +47,7 @@ class App {
         //     res.send("Express + TypeScript server");
         // });
 
+        // Find all devices a user has
         this.app.get("/users/:userId/devices", async (req: Request, res: Response) => {
             const { userId } = req.params
 
@@ -55,6 +56,7 @@ class App {
                 .catch(error => res.json({ error: error.message }));
         });
 
+        // Find a specific device owned by a user
         this.app.get("/users/:userId/devices/:id", async (req: Request, res: Response) => {
             const { userId, id } = req.params
 
@@ -69,6 +71,7 @@ class App {
                 .catch(error => res.json({ error: error.message }));
         });
 
+        // Create a new device for a user
         this.app.post("/users/:userId/devices", async (req: Request, res: Response) => {
             const { userId } = req.params
             const { name } = req.body
@@ -88,12 +91,12 @@ class App {
 
     registerGenericRoutes() {
         // Handling not found
-        this.app.use((req: Request, res: Response, next: NextFunction) => {
+        this.app.use((req: Request, res: Response, _: NextFunction) => {
             res.status(404).send("Resource not found")
         })
 
         // Handling HTTP error
-        this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+        this.app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
             console.error(err.stack)
             res.status(500).send("Internal server error")
         })
