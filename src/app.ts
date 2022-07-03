@@ -1,6 +1,14 @@
 import AppInitializer from "./app.initializer";
+import dotenv from "dotenv"
 
-const port = 8000;
+dotenv.config()
+
+let port = process.env.PORT as unknown as number;
+
+if (port == undefined) {
+    console.error("Invalid value for environment variable PORT")
+    process.exit(1)
+}
 
 new AppInitializer()
     .registerRoutes()
