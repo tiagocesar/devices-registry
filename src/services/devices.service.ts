@@ -18,7 +18,15 @@ class DevicesService {
     }
 
     async registerDevice(device: Device): Promise<boolean> {
+        const registeredDevices = await this.devicesRepo.getActiveDevicesCount(device.userId);
+        const allowedDevices = 2;
+
+        if (registeredDevices >= allowedDevices) {
+            throw new Error("This user can't register more devices");
+        }
+
         return await this.devicesRepo.registerDevice(device);
+
     }
 
     updateDevice(id: string, playable: boolean) {}

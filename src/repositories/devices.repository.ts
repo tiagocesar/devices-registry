@@ -67,6 +67,10 @@ export class DevicesRepository {
         return false;
     }
 
+    async getActiveDevicesCount(userId: string): Promise<number> {
+        return this.DeviceModel.count({userId: userId, playable: true});
+    }
+
     updateDevice(device: IDevice) {}
 }
 

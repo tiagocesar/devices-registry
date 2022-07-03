@@ -43,10 +43,6 @@ class App {
     registerRoutes() {
         this.app.use(bodyParser.json())
 
-        // this.app.get('/', (req: Request, res: Response) => {
-        //     res.send("Express + TypeScript server");
-        // });
-
         // Find all devices a user has
         this.app.get("/users/:userId/devices", async (req: Request, res: Response) => {
             const { userId } = req.params
@@ -83,7 +79,7 @@ class App {
 
             await this.devicesService.registerDevice(device)
                 .then(() => res.status(201).send("ok"))
-                .catch(error => res.json({ error: error.message }));
+                .catch(error => res.status(202).json({ error: error.message }));
         });
 
         return this
