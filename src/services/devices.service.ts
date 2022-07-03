@@ -1,13 +1,20 @@
 import DevicesRepository from "../repositories/devices.repository"
-import Device from "../models/devices.model";
 
 class DevicesService {
-    constructor(private _devicesRepo: DevicesRepository) {
+    constructor(private devicesRepo: DevicesRepository) {
     }
 
-    registerDevice(device: Device) {}
+    async getAllDevicesForUser(userId: string): Promise<IDevice[]> {
+        return await this.devicesRepo.getDevicesForUser(userId)
+    }
 
-    updateDevice(device: Device) {}
+    // getDeviceById(id: string): IDevice {return new IDevice();}
+
+    registerDevice(device: IDevice) {}
+
+    updateDevice(id: string, playable: boolean) {}
+
+    deleteDevice(id: string) {}
 }
 
 export default DevicesService

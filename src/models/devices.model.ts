@@ -1,8 +1,6 @@
-export class Device {
-    id: string = "";
-    userId: string = "";
-    name: string = "";
-    playable: boolean = false;
+interface IDevice {
+    id: string;
+    userId: string;
+    name: string;
+    playable: boolean;
 }
-
-export default Device
