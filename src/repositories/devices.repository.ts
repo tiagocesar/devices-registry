@@ -1,8 +1,9 @@
 import {connect, model, Model, Schema} from "mongoose";
+import {IDevice} from "../models/devices.model";
 
 
 export class DevicesRepository {
-    private Device: Model<IDevice>
+    private readonly DeviceModel: Model<IDevice>
 
     constructor(user: string, password: string, host: string, port: string, database: string) {
         // Define the necessary schema/model
@@ -13,14 +14,12 @@ export class DevicesRepository {
             playable: Boolean
         });
 
-        this.Device = model<IDevice>("Device", deviceSchema);
+        this.DeviceModel = model<IDevice>("Device", deviceSchema);
 
         // Connect to MongoDB
-        const uri = `mongodb://${user}:${password}@${host}:${port}/${database}`;
+        const uri = `mongodb://${user}:${password}@${host}:${port}/`;
 
-        connect(uri, {
-            keepAlive: true
-        }).then(
+        connect(uri).then(
             () => {
                 console.log("Connected to database");
             },
@@ -31,7 +30,7 @@ export class DevicesRepository {
     }
 
     async getDevicesForUser(userId: string): Promise<IDevice[]> {
-        return await this.Device.find({userId: userId}).lean()
+        return await this.DeviceModel.find({userId: userId}).lean()
             .then(res => {
                 return res;
             })
@@ -40,7 +39,33 @@ export class DevicesRepository {
             });
     }
 
-    registerDevice(device: IDevice) {}
+    async getDeviceById(userid: string, id: string): Promise<IDevice[]> {
+        return await this.DeviceModel.find({userId: userid, _id: id}).lean()
+            .then(res => {
+                return res;
+            })
+            .catch(error => {
+                throw error;
+            });
+    }
+
+    async registerDevice(device: IDevice): Promise<boolean> {
+        const dm = new this.DeviceModel({
+            userId: device.userId,
+            name: device.name,
+            playable: device.playable
+        });
+
+        await dm.save()
+            .then(() => {
+                return true
+            })
+            .catch(error => {
+                throw error;
+            });
+
+        return false;
+    }
 
     updateDevice(device: IDevice) {}
 }

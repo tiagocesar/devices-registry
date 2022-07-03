@@ -1,16 +1,25 @@
 import DevicesRepository from "../repositories/devices.repository"
+import {Device} from "../models/devices.model";
 
 class DevicesService {
     constructor(private devicesRepo: DevicesRepository) {
     }
 
-    async getAllDevicesForUser(userId: string): Promise<IDevice[]> {
-        return await this.devicesRepo.getDevicesForUser(userId)
+    async getAllDevicesForUser(userId: string): Promise<Device[]> {
+        return await this.devicesRepo.getDevicesForUser(userId);
     }
 
-    // getDeviceById(id: string): IDevice {return new IDevice();}
+    async getDeviceById(userid: string, id: string): Promise<Device | undefined> {
+        const device = await this.devicesRepo.getDeviceById(userid, id);
 
-    registerDevice(device: IDevice) {}
+        if (device.length > 0) {
+            return device[0];
+        }
+    }
+
+    async registerDevice(device: Device): Promise<boolean> {
+        return await this.devicesRepo.registerDevice(device);
+    }
 
     updateDevice(id: string, playable: boolean) {}
 

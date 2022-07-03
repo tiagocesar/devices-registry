@@ -3,6 +3,8 @@ import {debug} from "util";
 import DevicesService from "./services/devices.service";
 import DevicesRepository from "./repositories/devices.repository";
 import EntitlementService from "./services/entitlement.service";
+import bodyParser from "body-parser";
+import {Device} from "./models/devices.model";
 
 class App {
     private app: Express
@@ -39,16 +41,46 @@ class App {
     }
 
     registerRoutes() {
-        this.app.get('/', (req: Request, res: Response) => {
-            res.send("Express + TypeScript server");
-        });
+        this.app.use(bodyParser.json())
 
-        this.app.get("/devices/:userId", async (req: Request, res: Response) => {
+        // this.app.get('/', (req: Request, res: Response) => {
+        //     res.send("Express + TypeScript server");
+        // });
+
+        this.app.get("/users/:userId/devices", async (req: Request, res: Response) => {
             const { userId } = req.params
 
-            const devices = this.devicesService.getAllDevicesForUser(userId)
+            await this.devicesService.getAllDevicesForUser(userId)
+                .then((devices) => res.json(devices))
+                .catch(error => res.json({ error: error.message }));
+        });
 
-            res.send(devices)
+        this.app.get("/users/:userId/devices/:id", async (req: Request, res: Response) => {
+            const { userId, id } = req.params
+
+            await this.devicesService.getDeviceById(userId, id)
+                .then((device) => {
+                    if (device == null) {
+                        res.status(404)
+                    }
+
+                    res.json(device)
+                })
+                .catch(error => res.json({ error: error.message }));
+        });
+
+        this.app.post("/users/:userId/devices", async (req: Request, res: Response) => {
+            const { userId } = req.params
+            const { name } = req.body
+
+            const device = new Device();
+            device.userId = userId;
+            device.name = name;
+            device.playable = true;
+
+            await this.devicesService.registerDevice(device)
+                .then(() => res.status(201).send("ok"))
+                .catch(error => res.json({ error: error.message }));
         });
 
         return this
