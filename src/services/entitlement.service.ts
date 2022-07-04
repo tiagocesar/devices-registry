@@ -4,7 +4,7 @@ class EntitlementService {
   private readonly serviceUrl: string;
 
   constructor(serviceUrl: string) {
-    if (serviceUrl.length === 0) {
+    if (serviceUrl === undefined || serviceUrl.length === 0) {
       throw new Error("No URL provided for the Entitlement Service");
     }
 

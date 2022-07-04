@@ -2,9 +2,10 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 
 export class ConnectionSelector {
   getDB(): string {
-    let uri: string = "";
     if (process.env.NODE_ENV === "test") {
-      return this.getTestDataBaseURL();
+      this.getTestDataBaseURL().then((url) => {
+        return url;
+      });
     }
 
     return this.getDatabaseURL();
@@ -19,8 +20,8 @@ export class ConnectionSelector {
     return `mongodb://${user}:${password}@${host}:${port}/`;
   }
 
-  getTestDataBaseURL() {
-    const mongod = new MongoMemoryServer({
+  async getTestDataBaseURL() {
+    const mongod = await MongoMemoryServer.create({
       instance: {
         dbName: "myproject",
       },
