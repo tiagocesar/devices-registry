@@ -1,6 +1,6 @@
-all: clean test run
+all: clean run
 
-test:
+tests:
 	npm test
 
 run:
