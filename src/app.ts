@@ -17,18 +17,6 @@ class App {
   constructor() {
     this.port = process.env.PORT as unknown as number;
 
-    // const dbUri = new ConnectionSelector().getDB();
-    // const devicesRepository = new DevicesRepository(dbUri);
-    //
-    // const entitlement_url = process.env.ENTITLEMENT_URL as string;
-    //
-    // const entitlementService = new EntitlementService(entitlement_url);
-    //
-    // this.devicesService = new DevicesService(
-    //   entitlementService,
-    //   devicesRepository
-    // );
-
     return this;
   }
 
