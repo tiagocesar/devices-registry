@@ -68,7 +68,7 @@ class App {
         await this.devicesService
           .getDeviceById(userId, id)
           .then((device) => {
-            if (device == null) {
+            if (device === null) {
               res.status(404);
             }
 
@@ -92,7 +92,20 @@ class App {
 
         await this.devicesService
           .registerDevice(device)
-          .then(() => res.status(201).send("ok"))
+          .then(() => res.status(201).send())
+          .catch((error) => res.status(202).json({ error: error.message }));
+      }
+    );
+
+    this.app.patch(
+      "/users/:userId/devices/:id/",
+      async (req: Request, res: Response) => {
+        const { userId, id } = req.params;
+        const { name, playable } = req.body;
+
+        await this.devicesService
+          .updateDevice(userId, id, name, playable)
+          .then(() => res.status(201).send())
           .catch((error) => res.status(202).json({ error: error.message }));
       }
     );

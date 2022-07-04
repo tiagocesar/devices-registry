@@ -21,14 +21,10 @@ class DevicesService {
   }
 
   async registerDevice(device: Device): Promise<boolean> {
-    const registeredDevices = await this.devicesRepo.getActiveDevicesCount(
-      device.userId
-    );
-    const allowedDevices = await this.entitlementService.checkAvailability(
-      device.userId
-    );
+    const userCanRegisterPlayableDevice =
+      await this.userCanRegisterPlayableDevice(device.userId);
 
-    if (registeredDevices >= allowedDevices) {
+    if (!userCanRegisterPlayableDevice) {
       // Device shouldn't be able to stream
       device.playable = false;
     }
@@ -36,7 +32,49 @@ class DevicesService {
     return await this.devicesRepo.registerDevice(device);
   }
 
-  updateDevice(id: string, playable: boolean) {}
+  async userCanRegisterPlayableDevice(userId: string): Promise<boolean> {
+    const registeredDevices = await this.devicesRepo.getActiveDevicesCount(
+      userId
+    );
+    const allowedDevices = await this.entitlementService.checkAvailability(
+      userId
+    );
+
+    return registeredDevices < allowedDevices;
+  }
+
+  async updateDevice(
+    userId: string,
+    id: string,
+    name: string,
+    playable: boolean
+  ) {
+    if (playable) {
+      // Marking devices as playable requires a check for entitlement
+      const userCanRegisterPlayableDevice =
+        await this.userCanRegisterPlayableDevice(userId);
+
+      if (!userCanRegisterPlayableDevice) {
+        throw new Error(`No entitlements available for user ${userId}`);
+      }
+    }
+
+    const device = await this.getDeviceById(userId, id);
+
+    if (device === undefined) {
+      throw new Error(`No device found,  id ${id}`);
+    }
+
+    if (name !== undefined) {
+      device.name = name;
+    }
+
+    if (playable !== undefined) {
+      device.playable = playable;
+    }
+
+    return await this.devicesRepo.updateDevice(id, device);
+  }
 
   deleteDevice(id: string) {}
 }
