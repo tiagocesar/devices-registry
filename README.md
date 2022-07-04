@@ -11,7 +11,8 @@ All dependencies for the project are present in a docker compose file, so no ins
 From the root folder, run the command `make run` on a terminal window and everything will be setup:
 
 - MongoDB will be configured to run on port `27017`
-- Mongo Express will be configured to run on port `8081`
+- Mongo Express will be configured to run on port `8081` - use it to check the documents created in our local MongoDB
+  installation :D
 - The service itself will run on port `8000` (configurable)
 
 ## Endpoints
