@@ -46,7 +46,7 @@ class App {
     // To populate the body of POST/PUT/PATCH requests
     this.app.use(bodyParser.json());
 
-    // Find all devices a user has
+    // Finds all devices a user has
     this.app.get(
       "/users/:userId/devices",
       async (req: Request, res: Response) => {
@@ -59,7 +59,7 @@ class App {
       }
     );
 
-    // Find a specific device owned by a user
+    // Finds a specific device owned by a user
     this.app.get(
       "/users/:userId/devices/:id",
       async (req: Request, res: Response) => {
@@ -78,7 +78,7 @@ class App {
       }
     );
 
-    // Create a new device for a user
+    // Creates a new device for a user
     this.app.post(
       "/users/:userId/devices",
       async (req: Request, res: Response) => {
@@ -97,6 +97,7 @@ class App {
       }
     );
 
+    // Updates a device, like marking it as playable
     this.app.patch(
       "/users/:userId/devices/:id/",
       async (req: Request, res: Response) => {
@@ -105,7 +106,7 @@ class App {
 
         await this.devicesService
           .updateDevice(userId, id, name, playable)
-          .then(() => res.status(201).send())
+          .then(() => res.status(200).send())
           .catch((error) => res.status(202).json({ error: error.message }));
       }
     );
