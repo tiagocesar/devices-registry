@@ -5,6 +5,7 @@ import DevicesRepository from "./repositories/devices.repository";
 import EntitlementService from "./services/entitlement.service";
 import bodyParser from "body-parser";
 import { Device } from "./models/devices.model";
+import { ConnectionSelector } from "./connection";
 
 class App {
   private app: Express;
@@ -18,17 +19,8 @@ class App {
 
     this.port = process.env.PORT as unknown as number;
 
-    const mongodb_username = process.env.MONGODB_USERNAME as string;
-    const mongodb_password = process.env.MONGODB_PASSWORD as string;
-    const mongodb_host = process.env.MONGODB_HOST as string;
-    const mongodb_port = process.env.MONGODB_PORT as string;
-
-    const devicesRepository = new DevicesRepository(
-      mongodb_username,
-      mongodb_password,
-      mongodb_host,
-      mongodb_port
-    );
+    const dbUri = new ConnectionSelector().getDB();
+    const devicesRepository = new DevicesRepository(dbUri);
 
     const entitlement_url = process.env.ENTITLEMENT_URL as string;
 

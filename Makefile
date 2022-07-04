@@ -1,4 +1,4 @@
-all: test run
+all: clean test run
 
 test:
 	npm test

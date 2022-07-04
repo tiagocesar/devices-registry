@@ -4,7 +4,7 @@ import { IDevice } from "../models/devices.model";
 export class DevicesRepository {
   private readonly DeviceModel: Model<IDevice>;
 
-  constructor(user: string, password: string, host: string, port: string) {
+  constructor(uri: string) {
     // Define the necessary schema/model
     const deviceSchema = new Schema<IDevice>({
       userId: String,
@@ -15,8 +15,6 @@ export class DevicesRepository {
     this.DeviceModel = model<IDevice>("Device", deviceSchema);
 
     // Connect to MongoDB
-    const uri = `mongodb://${user}:${password}@${host}:${port}/`;
-
     connect(uri).then(
       () => {
         console.log("Connected to database");
