@@ -2,6 +2,8 @@ import request from "supertest";
 import App from "./app";
 import { Express } from "express";
 
+const user = "c0b8584c-97e3-4561-b8fc-58797b1f4c6d"; // Real case from the entitlements JSON - this user has 2 entitlements
+
 describe("Get Devices", () => {
   let app: Express;
 
@@ -28,8 +30,6 @@ describe("Get Devices", () => {
   });
 
   it("insert devices until no more entitlements are available", async () => {
-    const user = "c0b8584c-97e3-4561-b8fc-58797b1f4c6d"; // Real case from the entitlements JSON - this user has 2 entitlements
-
     // Insert 3 devices
     await request(app).post(`/users/${user}/devices`).send({ name: "iPhone" });
     await request(app).post(`/users/${user}/devices`).send({ name: "iPad" });
@@ -44,5 +44,21 @@ describe("Get Devices", () => {
     expect(res.body[2].name).toBe("Android");
     expect(res.body[2].playable).toBe(false);
     expect(res.status).toBe(200);
+  });
+
+  it("try to enable a device to be playable with no entitlements left should fail", async () => {
+    // Insert 3 devices
+    await request(app).post(`/users/${user}/devices`).send({ name: "iPhone" });
+    await request(app).post(`/users/${user}/devices`).send({ name: "iPad" });
+    await request(app).post(`/users/${user}/devices`).send({ name: "Android" });
+
+    const res1 = await request(app).get(`/users/${user}/devices`);
+    expect(res1.body.length).toBe(3);
+    const device = res1.body[2];
+
+    const res2 = await request(app)
+      .patch(`/users/${user}/devices/${device._id}`)
+      .send({ playable: true });
+    expect(res2.status).toBe(202);
   });
 });
