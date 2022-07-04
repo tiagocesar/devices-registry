@@ -1,4 +1,4 @@
-import express, { Express, NextFunction, Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { debug } from "util";
 import DevicesService from "./services/devices.service";
 import DevicesRepository from "./repositories/devices.repository";
@@ -8,18 +8,32 @@ import { Device } from "./models/devices.model";
 import { ConnectionSelector } from "./connection";
 
 class App {
-  private app: Express;
+  public app = express();
 
   private readonly port: number;
 
-  private readonly devicesService: DevicesService;
+  private devicesService: DevicesService | undefined;
 
   constructor() {
-    this.app = express();
-
     this.port = process.env.PORT as unknown as number;
 
-    const dbUri = new ConnectionSelector().getDB();
+    // const dbUri = new ConnectionSelector().getDB();
+    // const devicesRepository = new DevicesRepository(dbUri);
+    //
+    // const entitlement_url = process.env.ENTITLEMENT_URL as string;
+    //
+    // const entitlementService = new EntitlementService(entitlement_url);
+    //
+    // this.devicesService = new DevicesService(
+    //   entitlementService,
+    //   devicesRepository
+    // );
+
+    return this;
+  }
+
+  async configureDependencies() {
+    const dbUri = await new ConnectionSelector().getDB();
     const devicesRepository = new DevicesRepository(dbUri);
 
     const entitlement_url = process.env.ENTITLEMENT_URL as string;
@@ -35,6 +49,12 @@ class App {
   }
 
   registerRoutes() {
+    if (this.devicesService === undefined) {
+      throw new Error("Service registration failed for DevicesService");
+    }
+
+    const devicesService = this.devicesService;
+
     // To populate the body of POST/PUT/PATCH requests
     this.app.use(bodyParser.json());
 
@@ -44,7 +64,7 @@ class App {
       async (req: Request, res: Response) => {
         const { userId } = req.params;
 
-        await this.devicesService
+        await devicesService
           .getAllDevicesForUser(userId)
           .then((devices) => res.json(devices))
           .catch((error) => res.json({ error: error.message }));
@@ -57,7 +77,7 @@ class App {
       async (req: Request, res: Response) => {
         const { userId, id } = req.params;
 
-        await this.devicesService
+        await devicesService
           .getDeviceById(userId, id)
           .then((device) => {
             if (device === null) {
@@ -82,7 +102,7 @@ class App {
         device.name = name;
         device.playable = true;
 
-        await this.devicesService
+        await devicesService
           .registerDevice(device)
           .then(() => res.status(201).send())
           .catch((error) => res.status(202).json({ error: error.message }));
@@ -96,7 +116,7 @@ class App {
         const { userId, id } = req.params;
         const { name, playable } = req.body;
 
-        await this.devicesService
+        await devicesService
           .updateDevice(userId, id, name, playable)
           .then(() => res.status(200).send())
           .catch((error) => res.status(202).json({ error: error.message }));
@@ -109,7 +129,7 @@ class App {
       async (req: Request, res: Response) => {
         const { userId, id } = req.params;
 
-        await this.devicesService
+        await devicesService
           .deleteDevice(userId, id)
           .then(() => res.status(200).send())
           .catch((error) => res.status(202).json({ error: error.message }));
