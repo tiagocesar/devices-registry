@@ -5,7 +5,7 @@ import { Express } from "express";
 describe("Get Devices", () => {
   let app: Express;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     app = (await new App().configureDependencies())
       .registerRoutes()
       .registerGenericRoutes().app;
@@ -14,6 +14,35 @@ describe("Get Devices", () => {
   it("get devices should be an empty array", async () => {
     const res = await request(app).get("/users/123/devices");
     expect(res.body).toEqual([]);
+    expect(res.status).toBe(200);
+  });
+
+  it("get devices after inserting one device should be an array with one element", async () => {
+    const insertedResult = await request(app)
+      .post("/users/123/devices")
+      .send({ name: "iPhone" });
+    const res = await request(app).get("/users/123/devices");
+    expect(res.body.length).toBe(1);
+    expect(res.body[0].name).toBe("iPhone");
+    expect(res.status).toBe(200);
+  });
+
+  it("insert devices until no more entitlements are available", async () => {
+    const user = "c0b8584c-97e3-4561-b8fc-58797b1f4c6d"; // Real case from the entitlements JSON - this user has 2 entitlements
+
+    // Insert 3 devices
+    await request(app).post(`/users/${user}/devices`).send({ name: "iPhone" });
+    await request(app).post(`/users/${user}/devices`).send({ name: "iPad" });
+    await request(app).post(`/users/${user}/devices`).send({ name: "Android" });
+
+    const res = await request(app).get(`/users/${user}/devices`);
+    expect(res.body.length).toBe(3);
+    expect(res.body[0].name).toBe("iPhone");
+    expect(res.body[0].playable).toBe(true);
+    expect(res.body[1].name).toBe("iPad");
+    expect(res.body[1].playable).toBe(true);
+    expect(res.body[2].name).toBe("Android");
+    expect(res.body[2].playable).toBe(false);
     expect(res.status).toBe(200);
   });
 });
