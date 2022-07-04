@@ -1,9 +1,9 @@
 import App from "./app";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
 
 new App()
-    .registerRoutes()
-    .registerGenericRoutes() // For 404 and 500
-    .run()
+  .registerRoutes()
+  .registerGenericRoutes() // For 404 and 500
+  .run();

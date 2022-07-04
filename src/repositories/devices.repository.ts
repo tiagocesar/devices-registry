@@ -5,7 +5,7 @@ import {IDevice} from "../models/devices.model";
 export class DevicesRepository {
     private readonly DeviceModel: Model<IDevice>
 
-    constructor(user: string, password: string, host: string, port: string, database: string) {
+    constructor(user: string, password: string, host: string, port: string) {
         // Define the necessary schema/model
         const deviceSchema = new Schema<IDevice>({
             id: String,
