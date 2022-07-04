@@ -72,7 +72,7 @@ export class DevicesRepository {
     return this.DeviceModel.count({ userId: userId, playable: true });
   }
 
-  async updateDevice(id: string, device: IDevice): Promise<boolean> {
+  async updateDevice(id: string, device: IDevice) {
     await this.DeviceModel.findByIdAndUpdate(id, {
       userId: device.userId,
       name: device.name,
@@ -86,6 +86,16 @@ export class DevicesRepository {
       });
 
     return false;
+  }
+
+  async deleteDevice(id: string) {
+    await this.DeviceModel.findByIdAndDelete(id)
+      .then(() => {
+        return true;
+      })
+      .catch((error) => {
+        throw error;
+      });
   }
 }
 

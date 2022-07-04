@@ -76,7 +76,15 @@ class DevicesService {
     return await this.devicesRepo.updateDevice(id, device);
   }
 
-  deleteDevice(id: string) {}
+  async deleteDevice(userId: string, id: string) {
+    const exists = await this.getDeviceById(userId, id);
+
+    if (!exists) {
+      throw new Error(`No device found for user ${userId} with id ${id}`);
+    }
+
+    return await this.devicesRepo.deleteDevice(id);
+  }
 }
 
 export default DevicesService;

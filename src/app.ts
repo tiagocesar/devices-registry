@@ -111,6 +111,19 @@ class App {
       }
     );
 
+    // Deletes a device, use with caution
+    this.app.delete(
+      "/users/:userId/devices/:id/",
+      async (req: Request, res: Response) => {
+        const { userId, id } = req.params;
+
+        await this.devicesService
+          .deleteDevice(userId, id)
+          .then(() => res.status(200).send())
+          .catch((error) => res.status(202).json({ error: error.message }));
+      }
+    );
+
     return this;
   }
 
