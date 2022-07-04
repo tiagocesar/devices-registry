@@ -62,4 +62,5 @@ Deletes a device associated to a user.
 
 ## Running the tests
 
-TODO
+You can run the tests with coverage reporting via `make tests`. Running the tests in dev mode with watch enabled is also
+possible via `npm run test:dev`. 
